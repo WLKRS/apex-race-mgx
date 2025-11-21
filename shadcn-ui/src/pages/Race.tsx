@@ -1,15 +1,27 @@
+// ==========================================
+// ARQUIVO: src/pages/Race.tsx (SUBSTITUA)
+// ==========================================
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import CarCard from '@/components/CarCard';
 import { useGameStore } from '@/store/useGameStore';
 import { CarNFT, RaceType } from '@/types/game.types';
-import { Trophy, Zap, Package } from 'lucide-react';
+import { Trophy, Zap, Package, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { isCarOnCooldown } from '@/lib/calculations';
 
+// NOVO: Importar o hook da Solana
+import { useSolana } from '@/hooks/useSolana';
+import { useWallet } from '@solana/wallet-adapter-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+
 export default function Race() {
   const { inventory, startRace } = useGameStore();
+  const { connected } = useWallet();
+  const { payRaceFee, loading: txLoading, PROTOCOL_FEES } = useSolana();
+  
   const [selectedCar, setSelectedCar] = useState<CarNFT | null>(null);
   const [racing, setRacing] = useState(false);
 
@@ -44,6 +56,12 @@ export default function Race() {
   ];
 
   const handleRace = async (raceType: RaceType) => {
+    // Validações
+    if (!connected) {
+      toast.error('Conecte sua carteira primeiro!');
+      return;
+    }
+
     if (!selectedCar) {
       toast.error('Selecione um carro primeiro!');
       return;
@@ -62,13 +80,27 @@ export default function Race() {
     setRacing(true);
     
     try {
-      // Simulate race duration
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // PASSO 1: Pagar taxa onchain
+      toast.info('Aguardando confirmação da transação...');
+      const txSignature = await payRaceFee();
+      
+      if (!txSignature) {
+        // Transação foi cancelada ou falhou
+        setRacing(false);
+        return;
+      }
+
+      // PASSO 2: Processar corrida (offchain)
+      toast.info('Processando corrida...');
+      
+      // Simula tempo de corrida
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
       const result = await startRace(selectedCar.id, raceType);
       
+      // PASSO 3: Mostrar resultado
       toast.success(
-        `Corrida concluída! Você ganhou ${result.rcnEarned.toFixed(2)} RCN${
+        `🏁 Corrida concluída! Você ganhou ${result.rcnEarned.toFixed(2)} RCN${
           result.materialsDropped.length > 0 
             ? ` e ${result.materialsDropped.length} material(is)` 
             : ''
@@ -77,8 +109,9 @@ export default function Race() {
       );
       
       setSelectedCar(null);
+      
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Erro ao iniciar corrida';
+      const errorMessage = error instanceof Error ? error.message : 'Erro ao processar corrida';
       toast.error(errorMessage);
     } finally {
       setRacing(false);
@@ -89,6 +122,8 @@ export default function Race() {
     car => car.fuelLevel >= 10 && !isCarOnCooldown(car)
   );
 
+  const isProcessing = racing || txLoading;
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div>
@@ -97,6 +132,17 @@ export default function Race() {
           Escolha um carro e o tipo de corrida para começar
         </p>
       </div>
+
+      {/* Aviso se carteira não conectada */}
+      {!connected && (
+        <Alert>
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Conecte sua carteira para participar das corridas. Cada corrida custa{' '}
+            <strong>{PROTOCOL_FEES.race} SOL</strong> de taxa.
+          </AlertDescription>
+        </Alert>
+      )}
 
       <div className="grid lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
@@ -163,7 +209,9 @@ export default function Race() {
           <Card>
             <CardHeader>
               <CardTitle>Tipos de Corrida</CardTitle>
-              <CardDescription>Escolha sua estratégia</CardDescription>
+              <CardDescription>
+                Taxa por corrida: <strong>{PROTOCOL_FEES.race} SOL</strong>
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               {raceTypes.map((race) => {
@@ -184,9 +232,16 @@ export default function Race() {
                       <Button
                         className="w-full"
                         onClick={() => handleRace(race.type)}
-                        disabled={!selectedCar || racing}
+                        disabled={!selectedCar || isProcessing || !connected}
                       >
-                        {racing ? 'Correndo...' : 'Iniciar Corrida'}
+                        {isProcessing ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            {txLoading ? 'Aguardando TX...' : 'Correndo...'}
+                          </>
+                        ) : (
+                          'Iniciar Corrida'
+                        )}
                       </Button>
                     </CardContent>
                   </Card>
