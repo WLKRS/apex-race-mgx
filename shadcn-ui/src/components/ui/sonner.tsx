@@ -1,5 +1,10 @@
-import { useTheme } from 'next-themes';
+// ==========================================
+// ARQUIVO: src/components/ui/sonner.tsx
+// SUBSTITUA O ARQUIVO INTEIRO POR ESTE CONTEÚDO
+// ==========================================
+
 import { Toaster as Sonner, toast } from 'sonner';
+import { useTheme } from '@/providers/ThemeProvider';
 
 type ToasterProps = React.ComponentProps<typeof Sonner>;
 
