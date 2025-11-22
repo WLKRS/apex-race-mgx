@@ -72,8 +72,15 @@ export default function Race() {
       return;
     }
 
-    if (selectedCar.fuelLevel < 10) {
-      toast.error('Combustível insuficiente!');
+    // NOVO: Verificar se precisa de manutenção
+    if (selectedCar.needsMaintenance) {
+      toast.error('Este carro precisa de manutenção antes de correr! Vá para a Garagem.');
+      return;
+    }
+
+    // NOVO: Verificar corridas restantes
+    if (selectedCar.racesRemainingToday <= 0) {
+      toast.error('Tanque vazio! Reabasteça o carro na Garagem.');
       return;
     }
 
@@ -185,19 +192,34 @@ export default function Race() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                   <div>
                     <div className="text-muted-foreground">Aceleração</div>
-                    <div className="text-xl font-bold">{selectedCar.attributes.acceleration}/10</div>
+                    <div className="text-xl font-bold">{selectedCar.attributes.acceleration}/100</div>
                   </div>
                   <div>
                     <div className="text-muted-foreground">Tecnologia</div>
-                    <div className="text-xl font-bold">{selectedCar.attributes.technology}/10</div>
+                    <div className="text-xl font-bold">{selectedCar.attributes.technology}/100</div>
                   </div>
                   <div>
                     <div className="text-muted-foreground">Porta-Malas</div>
-                    <div className="text-xl font-bold">{selectedCar.attributes.trunk}/10</div>
+                    <div className="text-xl font-bold">{selectedCar.attributes.trunk}/100</div>
                   </div>
                   <div>
                     <div className="text-muted-foreground">Combustível</div>
-                    <div className="text-xl font-bold">{selectedCar.fuelLevel.toFixed(0)}%</div>
+                    <div className="text-xl font-bold text-green-600">
+                      {selectedCar.racesRemainingToday}/{selectedCar.fuelCapacity}
+                    </div>
+                    <div className="text-xs text-muted-foreground">corridas restantes</div>
+                  </div>
+                </div>
+                
+                {/* Info de custo */}
+                <div className="mt-4 p-3 bg-muted rounded-lg text-sm">
+                  <div className="flex justify-between">
+                    <span>Custo por corrida:</span>
+                    <span className="font-semibold">1 corrida do tanque + $0.15 manutenção</span>
+                  </div>
+                  <div className="flex justify-between mt-1">
+                    <span>Manutenção acumulada:</span>
+                    <span className="font-semibold text-orange-600">${selectedCar.maintenanceDue.toFixed(2)}</span>
                   </div>
                 </div>
               </CardContent>
