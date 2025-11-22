@@ -1,40 +1,82 @@
+// ==========================================
+// ARQUIVO: src/lib/constants.ts (SUBSTITUA)
+// ==========================================
+
 import { CarRarity, RaceType, MaterialTier, GarageLevel } from '@/types/game.types';
 import { StakingTier, TokenomicsAllocation } from '@/types/economy.types';
 
-// Game Constants
+// ==========================================
+// CONSTANTES DO JOGO (BASEADO NO WHITEPAPER)
+// ==========================================
+
 export const MINT_PRICE_USD = 25;
 export const FREIGHT_FEE_USD = 5;
 export const FREIGHT_WAIT_HOURS = 24;
 export const RACE_COOLDOWN_MINUTES = 5;
-export const MAINTENANCE_COST_PER_RACE = 0.15;
-export const FUEL_COST_PER_REFILL = 1.5;
+export const MAINTENANCE_COST_PER_RACE = 0.15; // $0.15 por corrida
+export const FUEL_COST_PER_REFILL = 1.50;      // $1.50 por reabastecimento
 export const PROTOCOL_FEE_SOL = 0.0005;
 
-// Rarity Distribution
+// ==========================================
+// SISTEMA DE ATRIBUTOS (1-100)
+// ==========================================
+
+// Atributos base por raridade
 export const RARITY_DISTRIBUTION = {
-  [CarRarity.COMMON]: { percentage: 45, quantity: 22500, baseLevel: 1 },
-  [CarRarity.UNCOMMON]: { percentage: 25, quantity: 12500, baseLevel: 2 },
-  [CarRarity.RARE]: { percentage: 15, quantity: 7500, baseLevel: 3 },
-  [CarRarity.SUPER_RARE]: { percentage: 8, quantity: 4000, baseLevel: 4 },
-  [CarRarity.EPIC]: { percentage: 4, quantity: 2000, baseLevel: 5 },
-  [CarRarity.LEGENDARY]: { percentage: 2, quantity: 1000, baseLevel: 6 },
-  [CarRarity.MYTHIC]: { percentage: 1, quantity: 500, baseLevel: 7 },
+  [CarRarity.COMMON]: { percentage: 45, quantity: 22500, baseMin: 10, baseMax: 20 },
+  [CarRarity.UNCOMMON]: { percentage: 25, quantity: 12500, baseMin: 20, baseMax: 30 },
+  [CarRarity.RARE]: { percentage: 15, quantity: 7500, baseMin: 30, baseMax: 40 },
+  [CarRarity.SUPER_RARE]: { percentage: 8, quantity: 4000, baseMin: 40, baseMax: 50 },
+  [CarRarity.EPIC]: { percentage: 4, quantity: 2000, baseMin: 50, baseMax: 60 },
+  [CarRarity.LEGENDARY]: { percentage: 2, quantity: 1000, baseMin: 60, baseMax: 70 },
+  [CarRarity.MYTHIC]: { percentage: 1, quantity: 500, baseMin: 65, baseMax: 70 },
 };
 
-// Technology Attribute -> Races per Tank
-export const TECH_RACES_MAP: Record<number, number> = {
-  1: 10, 2: 10, 3: 11, 4: 12, 5: 13,
-  6: 14, 7: 15, 8: 17, 9: 19, 10: 21,
-};
+// ==========================================
+// SISTEMA DE TECNOLOGIA -> CORRIDAS POR TANQUE
+// ==========================================
+// Baseado no whitepaper: Technology Level -> Races per Tank
 
-// Race Type Rewards
+export function getRacesPerTank(technologyAttribute: number): number {
+  // Converte atributo (1-100) para corridas por tanque (10-21)
+  if (technologyAttribute <= 20) return 10;
+  if (technologyAttribute <= 30) return 11;
+  if (technologyAttribute <= 40) return 12;
+  if (technologyAttribute <= 50) return 13;
+  if (technologyAttribute <= 60) return 14;
+  if (technologyAttribute <= 70) return 15;
+  if (technologyAttribute <= 80) return 17;
+  if (technologyAttribute <= 90) return 19;
+  return 21; // 91-100
+}
+
+// Tabela do whitepaper para referência
+export const TECH_RACES_TABLE = [
+  { techRange: '1-20', races: 10 },
+  { techRange: '21-30', races: 11 },
+  { techRange: '31-40', races: 12 },
+  { techRange: '41-50', races: 13 },
+  { techRange: '51-60', races: 14 },
+  { techRange: '61-70', races: 15 },
+  { techRange: '71-80', races: 17 },
+  { techRange: '81-90', races: 19 },
+  { techRange: '91-100', races: 21 },
+];
+
+// ==========================================
+// RECOMPENSAS POR TIPO DE CORRIDA
+// ==========================================
+
 export const RACE_REWARDS = {
   [RaceType.DRAG]: { rcnPercent: 95, materialChance: 5 },
   [RaceType.STREET]: { rcnPercent: 50, materialChance: 50 },
   [RaceType.SCAVENGE]: { rcnPercent: 5, materialChance: 95 },
 };
 
-// ROI Table (Base stats, daily dedicated player)
+// ==========================================
+// ROI TABLE (Baseado no Whitepaper)
+// ==========================================
+
 export const ROI_TABLE = {
   [CarRarity.COMMON]: { dailyRaces: 20, grossDaily: 8.12, costDaily: 6.04, netDaily: 2.08, roiDays: 12 },
   [CarRarity.UNCOMMON]: { dailyRaces: 20, grossDaily: 8.54, costDaily: 6.04, netDaily: 2.50, roiDays: 10 },
@@ -45,7 +87,10 @@ export const ROI_TABLE = {
   [CarRarity.MYTHIC]: { dailyRaces: 34, grossDaily: 31.08, costDaily: 9.55, netDaily: 21.53, roiDays: 1.16 },
 };
 
-// Garage Levels
+// ==========================================
+// NÍVEIS DE GARAGEM
+// ==========================================
+
 export const GARAGE_LEVELS: GarageLevel[] = [
   { level: 1, slots: 1, dailyRefills: 1, upgradeCostRCN: 0 },
   { level: 2, slots: 2, dailyRefills: 2, upgradeCostRCN: 50 },
@@ -57,7 +102,10 @@ export const GARAGE_LEVELS: GarageLevel[] = [
   { level: 8, slots: 20, dailyRefills: 8, upgradeCostRCN: 1800 },
 ];
 
-// Tokenomics
+// ==========================================
+// TOKENOMICS
+// ==========================================
+
 export const TOTAL_SUPPLY = 1_000_000_000;
 export const TOKENOMICS: TokenomicsAllocation[] = [
   { category: 'Recompensas P2E', percentage: 55, amount: 550_000_000, description: 'Reserva de longo prazo para recompensas' },
@@ -68,7 +116,10 @@ export const TOKENOMICS: TokenomicsAllocation[] = [
   { category: 'Marketing & Airdrops', percentage: 5, amount: 50_000_000, description: 'Campanhas e atração' },
 ];
 
-// Staking Tiers
+// ==========================================
+// STAKING
+// ==========================================
+
 export const STAKING_TIERS: StakingTier[] = [
   { lockPeriod: 'Flexível', multiplier: 1, description: 'Sem bloqueio' },
   { lockPeriod: '3 Meses', multiplier: 1.5, description: '90 dias' },
@@ -76,16 +127,22 @@ export const STAKING_TIERS: StakingTier[] = [
   { lockPeriod: '12 Meses', multiplier: 4, description: '365 dias' },
 ];
 
-// Fee Distribution
+// ==========================================
+// DISTRIBUIÇÃO DE TAXAS
+// ==========================================
+
 export const FEE_DISTRIBUTION = {
-  referral: 10, // 10% to referrer
-  burned: 60, // 60% burned
-  p2ePool: 25, // 25% back to P2E pool
-  stakers: 10, // 10% to stakers
-  bugBounty: 5, // 5% to bug bounty
+  referral: 10,   // 10% para quem indicou
+  burned: 60,     // 60% queimados
+  p2ePool: 25,    // 25% volta para recompensas
+  stakers: 10,    // 10% para stakers
+  bugBounty: 5,   // 5% para bug bounty
 };
 
-// Marketplace Fees
+// ==========================================
+// TAXAS DO MARKETPLACE
+// ==========================================
+
 export const MARKETPLACE_FEES = {
   nft: {
     listingFeeSOL: 0.02,
@@ -99,7 +156,10 @@ export const MARKETPLACE_FEES = {
   },
 };
 
-// Crafting Costs
+// ==========================================
+// CUSTOS DE CRAFTING
+// ==========================================
+
 export const CRAFTING_COSTS = {
   [MaterialTier.TIER1]: { inputQty: 5, rcnCost: 2 },
   [MaterialTier.TIER2]: { inputQty: 3, rcnCost: 5 },
