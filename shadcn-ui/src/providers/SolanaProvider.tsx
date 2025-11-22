@@ -1,7 +1,7 @@
 // ==========================================
 // ARQUIVO: src/providers/SolanaProvider.tsx
+// SUBSTITUA O ARQUIVO INTEIRO POR ESTE CONTEÚDO
 // ==========================================
-// Crie este arquivo novo na pasta src/providers/
 
 import { FC, ReactNode, useMemo } from 'react';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
@@ -10,42 +10,21 @@ import {
   PhantomWalletAdapter, 
   SolflareWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
-import { clusterApiUrl } from '@solana/web3.js';
 
 // IMPORTANTE: Importe os estilos do modal
 import '@solana/wallet-adapter-react-ui/styles.css';
 
 // ==========================================
-// CONFIGURAÇÃO
-// ==========================================
-
-// ==========================================
 // CONFIGURAÇÃO DE RPC
 // ==========================================
-// O RPC público da Solana frequentemente bloqueia requisições.
-// Use um dos RPCs gratuitos abaixo ou contrate um pago.
+// O RPC público da Solana bloqueia requisições.
+// Usamos o Ankr que é gratuito e funciona bem.
 
-// OPÇÕES DE RPC GRATUITOS (escolha um):
-const RPC_OPTIONS = {
-  // Helius (gratuito até 100k req/dia) - RECOMENDADO
-  helius: 'https://mainnet.helius-rpc.com/?api-key=YOUR_API_KEY',
-  
-  // Quicknode público
-  quicknode: 'https://solana-mainnet.core.chainstack.com/YOUR_KEY',
-  
-  // Alchemy
-  alchemy: 'https://solana-mainnet.g.alchemy.com/v2/YOUR_KEY',
-  
-  // RPCs públicos (podem ter rate limit)
-  publicNode: 'https://solana-rpc.publicnode.com',
-  ankr: 'https://rpc.ankr.com/solana',
-  
-  // Devnet para testes
-  devnet: 'https://api.devnet.solana.com',
-};
+const RPC_ENDPOINT = 'https://rpc.ankr.com/solana';
 
-// USE ESTE - Ankr funciona bem e é gratuito
-const RPC_ENDPOINT = RPC_OPTIONS.ankr;
+// Alternativas caso o Ankr não funcione:
+// const RPC_ENDPOINT = 'https://solana-mainnet.g.alchemy.com/v2/demo';
+// const RPC_ENDPOINT = 'https://api.mainnet-beta.solana.com';
 
 // ==========================================
 // PROVIDER COMPONENT
@@ -56,7 +35,6 @@ interface Props {
 }
 
 export const SolanaProvider: FC<Props> = ({ children }) => {
-  // Lista de carteiras suportadas
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
