@@ -19,14 +19,33 @@ import '@solana/wallet-adapter-react-ui/styles.css';
 // CONFIGURAÇÃO
 // ==========================================
 
-// Mude para 'devnet' para testes, 'mainnet-beta' para produção
-const NETWORK = 'mainnet-beta';
+// ==========================================
+// CONFIGURAÇÃO DE RPC
+// ==========================================
+// O RPC público da Solana frequentemente bloqueia requisições.
+// Use um dos RPCs gratuitos abaixo ou contrate um pago.
 
-// RPC Endpoint - você pode usar um personalizado para mais velocidade
-// Exemplos de RPCs pagos: Helius, QuickNode, Alchemy
-const RPC_ENDPOINT = clusterApiUrl(NETWORK);
-// Ou use um RPC customizado:
-// const RPC_ENDPOINT = 'https://seu-rpc.com';
+// OPÇÕES DE RPC GRATUITOS (escolha um):
+const RPC_OPTIONS = {
+  // Helius (gratuito até 100k req/dia) - RECOMENDADO
+  helius: 'https://mainnet.helius-rpc.com/?api-key=YOUR_API_KEY',
+  
+  // Quicknode público
+  quicknode: 'https://solana-mainnet.core.chainstack.com/YOUR_KEY',
+  
+  // Alchemy
+  alchemy: 'https://solana-mainnet.g.alchemy.com/v2/YOUR_KEY',
+  
+  // RPCs públicos (podem ter rate limit)
+  publicNode: 'https://solana-rpc.publicnode.com',
+  ankr: 'https://rpc.ankr.com/solana',
+  
+  // Devnet para testes
+  devnet: 'https://api.devnet.solana.com',
+};
+
+// USE ESTE - Ankr funciona bem e é gratuito
+const RPC_ENDPOINT = RPC_OPTIONS.ankr;
 
 // ==========================================
 // PROVIDER COMPONENT
