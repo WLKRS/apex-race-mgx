@@ -7,8 +7,9 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-// NOVO: Importar o provider da Solana
+// NOVO: Importar os providers
 import { SolanaProvider } from './providers/SolanaProvider';
+import { ThemeProvider } from './providers/ThemeProvider';
 
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
