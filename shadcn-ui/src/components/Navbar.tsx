@@ -14,6 +14,9 @@ import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
+// NOVO: Import do toggle de tema
+import { ThemeToggle } from './ThemeToggle';
+
 export default function Navbar() {
   const { connection } = useConnection();
   const { publicKey, connected, connecting, disconnect } = useWallet();
