@@ -166,3 +166,22 @@ export const CRAFTING_COSTS = {
   [MaterialTier.TIER3]: { inputQty: 3, rcnCost: 15 },
   [MaterialTier.TIER4]: { inputQty: 3, rcnCost: 50 },
 };
+
+// ==========================================
+// ADICIONE ISSO NO FINAL DO ARQUIVO src/lib/constants.ts
+// ==========================================
+
+// Tabela de Technology -> Corridas por Tanque
+// (Mantido para compatibilidade com código existente)
+export const TECH_RACES_MAP: Record<number, number> = {
+  1: 10, 
+  2: 10, 
+  3: 11, 
+  4: 12, 
+  5: 13,
+  6: 14, 
+  7: 15, 
+  8: 17, 
+  9: 19, 
+  10: 21,
+};
