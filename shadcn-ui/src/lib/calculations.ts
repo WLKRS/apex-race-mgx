@@ -1,5 +1,5 @@
 import { CarNFT, RaceType, RaceResult, MaterialTier, Material } from '@/types/game.types';
-import { RACE_REWARDS, MAINTENANCE_COST_PER_RACE, TECH_RACES_MAP } from './constants';
+import { RACE_REWARDS, MAINTENANCE_COST_PER_RACE, getRacesPerTank } from './constants';
 
 // Calculate race reward based on car attributes and race type
 export function calculateRaceReward(car: CarNFT, raceType: RaceType): RaceResult {
@@ -14,7 +14,7 @@ export function calculateRaceReward(car: CarNFT, raceType: RaceType): RaceResult
   const materialDropChance = (raceConfig.materialChance / 100) * (1 + car.attributes.trunk * 0.1);
   const materialsDropped = Math.random() < materialDropChance ? generateMaterialDrop(car.attributes.trunk) : [];
   
-  const fuelConsumed = 100 / TECH_RACES_MAP[car.attributes.technology];
+  const fuelConsumed = 100 / getRacesPerTank[car.attributes.technology];
   const maintenanceAdded = MAINTENANCE_COST_PER_RACE;
   
   return {
@@ -53,7 +53,7 @@ function generateMaterialDrop(trunkLevel: number): Material[] {
 
 // Calculate ROI for a car
 export function calculateROI(car: CarNFT, mintPrice: number): number {
-  const dailyRaces = TECH_RACES_MAP[car.attributes.technology];
+  const dailyRaces = getRacesPerTank[car.attributes.technology];
   const rewardPerRace = 0.4 * (1 + (car.attributes.acceleration - 1) * 0.15) * 0.95; // Drag race
   const dailyGross = rewardPerRace * dailyRaces;
   const dailyCost = (MAINTENANCE_COST_PER_RACE * dailyRaces) + 1.5; // maintenance + fuel
